@@ -9,14 +9,15 @@ import com.syr.mapper.ShopMapper;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 
-import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.syr.utils.RedisConstants.CACHE_SHOP_KEY;
-import static com.syr.utils.RedisConstants.CACHE_SHOP_TTL;
+import java.util.concurrent.TimeUnit;
+
+import static com.syr.utils.RedisConstants.*;
+
 @Service
 public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService{
 
@@ -26,16 +27,23 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     public Result getById(Long id) {
         // 1.从redis查商铺缓存
         String shopJson = stringRedisTemplate.opsForValue().get(CACHE_SHOP_KEY + id);
-        // 2.判断是否存在
+        // 2.判断该商铺在redis中的缓存是否存在
         if(StrUtil.isNotBlank(shopJson)) {
-            // 3.存在，直接返回  
+            // 3.存在，直接返回信息
             Shop shop = JSONUtil.toBean(shopJson, Shop.class);
             return Result.ok(shop);
+        }
+        // 如果是空值
+        if ("".equals(shopJson) ) {
+            // 返回错误信息
+            return Result.fail("店铺信息不存在！");
         }
         // 4.不存在，根据id去数据库查，如果数据库没有，返回错误
         Shop shop = lambdaQuery().eq(Shop::getId, id).one();
 
         if(shop == null) {
+            // 将空值写入redis
+            stringRedisTemplate.opsForValue().set(CACHE_SHOP_KEY + id,"",CACHE_NULL_TTL, TimeUnit.MINUTES);
             return Result.fail("商铺不存在！");
         }
         // 5.数据库存在，写入redis，并设置过期时间
