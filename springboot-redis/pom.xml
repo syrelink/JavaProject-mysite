@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.syr</groupId>
-    <artifactId>springboot-mysite</artifactId>
+    <artifactId>springboot-redis</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>springboot-mysite</name>
     <description>springboot-mysite</description>
