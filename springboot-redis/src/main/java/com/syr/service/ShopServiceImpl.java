@@ -50,7 +50,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     }
 
     // 缓存穿透
-    public Shop queryWithPassThrough(long id) {
+    public Shop queryWithPassThrough(Long id) {
         // 1.从redis查商铺缓存
         String shopJson = stringRedisTemplate.opsForValue().get(CACHE_SHOP_KEY + id);
         // 2.判断该商铺在redis中的缓存是否存在
@@ -167,6 +167,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     }
     public void saveShop2Redis(Long id,Long expireSeconds) {
         // 1.查询商铺信息
+
         Shop shop = lambdaQuery().eq(Shop::getId,id).one();
         // 2.封装逻辑过期时间
         RedisData redisData = new RedisData();
