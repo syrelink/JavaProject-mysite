@@ -6,7 +6,7 @@ import com.syr.entity.Shop;
 
 public interface IShopService {
 
-   public Result getById(Long id);
+   public Result queryById(Long id);
 
    public Result update(Shop shop);
 }
