@@ -1,8 +1,9 @@
-package com.syr.service;
+package com.syr.service.Impl;
 
 import com.syr.dto.Result;
 import com.syr.mapper.ShopTypeMapper;
 
+import com.syr.service.IShopTypeService;
 import jakarta.annotation.Resource;
 
 import com.syr.entity.ShopType;
@@ -15,7 +16,7 @@ import java.util.List;
 
 
 @Service
-public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> implements IShopTypeService{
+public class ShopTypeServiceImpl extends ServiceImpl<ShopTypeMapper, ShopType> implements IShopTypeService {
 
 
     @Resource

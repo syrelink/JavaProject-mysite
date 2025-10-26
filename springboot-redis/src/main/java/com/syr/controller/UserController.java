@@ -19,16 +19,17 @@ public class UserController {
 
     @Resource
     private IUserService userService;
+   // 发送验证码
     @PostMapping("code")
     public Result sendCode(@RequestParam String phone, HttpSession session) {
         return userService.sendCode(phone,session);
     }
-
+    // 根据验证码手机登陆、注册
     @PostMapping("login")
     public Result login(@RequestBody LoginFormDto loginform,HttpSession session){
         return userService.login(loginform,session);
     }
-
+    // 获取当前登陆的用户信息
     @GetMapping("me")
     public Result me() {
         UserDTO user = UserHolder.getUser();

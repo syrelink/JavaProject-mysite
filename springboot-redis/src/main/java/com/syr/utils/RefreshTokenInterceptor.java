@@ -19,11 +19,12 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
+    public RefreshTokenInterceptor(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("authorization");
-
         // 如果没有token则交给后面的拦截器拦截
         if(StrUtil.isBlank(token)) {
             return true;

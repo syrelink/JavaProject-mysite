@@ -1,12 +1,14 @@
-package com.syr.service;
+package com.syr.service.Impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.syr.dto.LoginFormDto;
 import com.syr.dto.UserDTO;
 import com.syr.entity.User;
 import com.syr.mapper.UserMapper;
+import com.syr.service.IUserService;
 import com.syr.utils.RegexUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +28,7 @@ import static com.syr.utils.SystemConstants.USER_NICK_NAME_PREFIX;
 
 @Slf4j
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService{
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -46,6 +49,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return Result.ok();
     }
 
+    // 登陆
     public Result login(LoginFormDto loginform, HttpSession session) {
         //获取用户输入的数据
         String phone = loginform.getPhone();
@@ -56,7 +60,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         // 从redis获取验证码，并校验
         String cacheCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + phone);
-
         if(cacheCode == null || !cacheCode.toString().equals(code)) {
             return Result.fail("验证码错误！");
         }
@@ -71,11 +74,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String token = UUID.randomUUID().toString();
         // 2. 将user转为hashmap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
-        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO);
+        CopyOptions copyOptions = CopyOptions.create()
+                .setIgnoreNullValue(true) // 忽略null值
+                // 核心：设置一个字段值编辑器，把所有非null的值都转成String
+                .setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString());
+        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(), copyOptions);
         // 3. 存储到redis
-        stringRedisTemplate.opsForHash().putAll(LOGIN_USER_KEY+token,userMap);
+        stringRedisTemplate.opsForHash().putAll(LOGIN_USER_KEY+token, userMap);
         // 4. 设置token有效期
         stringRedisTemplate.expire(LOGIN_USER_KEY+token,30,TimeUnit.MINUTES);
+
         return Result.ok(token);
     }
 

@@ -1,4 +1,4 @@
-package com.syr.service;
+package com.syr.service.Impl;
 
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.json.JSON;
@@ -11,6 +11,7 @@ import com.syr.mapper.ShopMapper;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 
+import com.syr.service.IShopService;
 import com.syr.utils.CacheClient;
 import com.syr.utils.RedisConstants;
 import com.syr.utils.RedisData;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import static com.syr.utils.RedisConstants.*;
 
 @Service
-public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService{
+public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;

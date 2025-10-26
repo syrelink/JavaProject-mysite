@@ -1,5 +1,6 @@
 package com.syr.utils;
 
+import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ public class RedisIdWorker {
     private static final long BEGIN_TIMESTAMP = 1735689600L;
     private static final long COUNT_BITS = 32;
 
+    @Resource
     private StringRedisTemplate stringRedisTemplate;
     public long nextId(String keyPrefix) {
         // 1.生成时间戳
